@@ -1,6 +1,6 @@
 OBJS_BOOTPACK = bootpack.obj naskfunc.obj hankaku.obj graphic.obj dsctbl.obj \
 		int.obj fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj timer.obj \
-		mtask.obj window.obj console.obj file.obj
+		mtask.obj window.obj console.obj file.obj 
 
 
 TOOLPATH = ../z_tools/
@@ -51,23 +51,34 @@ bootpack.bim : $(OBJS_BOOTPACK) Makefile
 bootpack.hrb : bootpack.bim Makefile
 	$(BIM2HRB) bootpack.bim bootpack.hrb 0
 
-# 将应用程序hlt.nas转化为hrb文件
-hlt.hrb : hlt.nas Makefile
-	$(NASK) hlt.nas hlt.hrb hlt.lst
-	
 # 将.hrb映像和asmhead.bin 合并做成haribote.sys系统文件
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	copy /B asmhead.bin+bootpack.hrb haribote.sys
+	
+# 将应用程序hello.nas转化为hrb文件
+hello.hrb : hello.nas Makefile
+	$(NASK) hello.nas hello.hrb hello.lst
+hello2.hrb : hello2.nas Makefile
+	$(NASK) hello2.nas hello2.hrb hello2.lst
+
+# 将应用程序hello3生成
+hello3.bim : hello3.obj a_nask.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:hello3.bim map:hello3.map hello3.obj a_nask.obj
+hello3.hrb : hello3.bim Makefile
+	$(BIM2HRB) hello3.bim hello3.hrb 0
 
 # 把ipl10.bin和haribote.sys结合做成操作系统文件haribote.img
 # 将ipl10.nas  make.bat hlt.hrb 这3个文件也读进去
-haribote.img : ipl10.bin haribote.sys hlt.hrb Makefile
+haribote.img : ipl10.bin haribote.sys Makefile \
+		hello.hrb hello2.hrb  hello3.hrb
 	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
 		wbinimg src:ipl10.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
 		copy from:ipl10.nas to:@: \
 		copy from:make.bat to:@: \
-		copy from:hlt.hrb to:@: \
+		copy from:hello.hrb to:@: \
+		copy from:hello2.hrb to:@: \
+		copy from:hello3.hrb to:@: \
 		imgout:haribote.img
 
 # 对c文件进行编译
@@ -100,10 +111,11 @@ clean :
 	$(DEL) *.bin
 	$(DEL) *.lst
 	$(DEL) *.obj
-	$(DEL) bootpack.map
-	$(DEL) bootpack.bim
-	$(DEL) bootpack.hrb
-	$(DEL) haribote.sys
+	$(DEL) *.bak
+	$(DEL) *.map
+	$(DEL) *.bim
+	$(DEL) *.hrb
+	$(DEL) *.sys
 
 src_only :
 	$(MAKE) clean
