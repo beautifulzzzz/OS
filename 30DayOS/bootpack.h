@@ -1,4 +1,4 @@
-/* In this file, not only have the defination of the function, but also 
+﻿/* In this file, not only have the defination of the function, but also 
 hava the description of where the function is.*/
 
 /* asmhead.nas */
@@ -35,6 +35,10 @@ unsigned int memtest_sub(unsigned int start, unsigned int end);/////////
 void farjmp(int eip,int cs);//任务切换
 //void taskswitch3(void);//任务切换
 //void taskswitch4(void);//任务切换
+void farcall(int eip, int cs);//far 调用
+//void asm_cons_putchar(void);//显示一个字符
+void asm_hrb_api(void);//调用API
+
 /* fifo.c */
 struct FIFO32 {//FIFO缓冲区数据结构
     int *buf;//缓冲区
@@ -259,12 +263,17 @@ struct CONSOLE {
 void console_task(struct SHEET *sheet, unsigned int memtotal);//console任务
 void cons_putchar(struct CONSOLE *cons, int chr, char move);//显示一个字符
 void cons_newline(struct CONSOLE *cons);//换行与滚动
+void cons_putstr0(struct CONSOLE *cons, char *s);
+void cons_putstr1(struct CONSOLE *cons, char *s, int l);
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int memtotal);//运行命令行，调用下面的命令行函数
 void cmd_mem(struct CONSOLE *cons, unsigned int memtotal);
 void cmd_cls(struct CONSOLE *cons);
 void cmd_dir(struct CONSOLE *cons);
 void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline);
-void cmd_hlt(struct CONSOLE *cons, int *fat);
+//void cmd_hlt(struct CONSOLE *cons, int *fat);
+int  cmd_app(struct CONSOLE *cons, int *fat, char *cmdline);//只要输入文件名就能执行该文件，应用程序
+void hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax);//API处理程序
+
 
 /* file.c */
 struct FILEINFO {
